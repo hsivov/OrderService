@@ -13,6 +13,8 @@ import com.example.orderservice.service.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Service
@@ -31,7 +33,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponseDTO getOrderById(Long orderId) {
+    public OrderResponseDTO getOrderById(Long orderId) throws NoSuchAlgorithmException, InvalidKeyException {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -42,7 +44,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponseDTO createOrder(CreateOrderRequestDTO createOrderRequest) {
+    public OrderResponseDTO createOrder(CreateOrderRequestDTO createOrderRequest) throws NoSuchAlgorithmException, InvalidKeyException {
         Order order = new Order();
         order.setCustomerId(createOrderRequest.getCustomerId());
         order.setBoughtGamesIds(createOrderRequest.getGameIds());
@@ -59,18 +61,23 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderResponseDTO> getOrdersByCustomer(Long customerId) {
+    public List<OrderResponseDTO> getOrdersByCustomer(Long customerId) throws NoSuchAlgorithmException, InvalidKeyException {
         List<Order> orders = orderRepository.findByCustomerId(customerId);
         UserDTO customer = userService.getUserById(customerId);
 
         return orders.stream().map(order -> {
-            List<GameDTO> boughtGames = gameService.getGamesByIds(order.getBoughtGamesIds());
+            List<GameDTO> boughtGames;
+            try {
+                boughtGames = gameService.getGamesByIds(order.getBoughtGamesIds());
+            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+                throw new RuntimeException(e);
+            }
             return new OrderResponseDTO(order, customer, boughtGames);
         }).toList();
     }
 
     @Override
-    public OrderResponseDTO updateOrderStatus(Long orderId, OrderStatus status) {
+    public OrderResponseDTO updateOrderStatus(Long orderId, OrderStatus status) throws NoSuchAlgorithmException, InvalidKeyException {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
@@ -88,8 +95,18 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponseDTO> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
         return orders.stream().map(order -> {
-            UserDTO customer = userService.getUserById(order.getCustomerId());
-            List<GameDTO> boughtGames = gameService.getGamesByIds(order.getBoughtGamesIds());
+            UserDTO customer;
+            try {
+                customer = userService.getUserById(order.getCustomerId());
+            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+                throw new RuntimeException(e);
+            }
+            List<GameDTO> boughtGames;
+            try {
+                boughtGames = gameService.getGamesByIds(order.getBoughtGamesIds());
+            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+                throw new RuntimeException(e);
+            }
             return new OrderResponseDTO(order, customer, boughtGames);
         }).toList();
     }

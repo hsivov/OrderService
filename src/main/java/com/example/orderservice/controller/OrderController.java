@@ -6,6 +6,8 @@ import com.example.orderservice.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @RestController
@@ -19,7 +21,7 @@ public class OrderController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody CreateOrderRequestDTO createOrderRequestDTO) {
+    public ResponseEntity<OrderResponseDTO> createOrder(@RequestBody CreateOrderRequestDTO createOrderRequestDTO) throws NoSuchAlgorithmException, InvalidKeyException {
         OrderResponseDTO order = orderService.createOrder(createOrderRequestDTO);
         return ResponseEntity.ok(order);
     }
