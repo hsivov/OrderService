@@ -33,6 +33,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public OrderResponseDTO getOrderById(Long orderId) throws NoSuchAlgorithmException, InvalidKeyException {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
@@ -49,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
         order.setCustomerId(createOrderRequest.getCustomerId());
         order.setBoughtGamesIds(createOrderRequest.getGameIds());
         order.setTotalPrice(createOrderRequest.getTotalPrice());
-        order.setStatus(OrderStatus.PENDING);
+        order.setStatus(createOrderRequest.getPaymentMethod().equals("credit-card") ? OrderStatus.APPROVED : OrderStatus.PENDING);
         order.setOrderDate(createOrderRequest.getOrderDate());
 
         Order savedOrder = orderRepository.save(order);
