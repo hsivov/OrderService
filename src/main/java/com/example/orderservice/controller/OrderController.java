@@ -37,4 +37,11 @@ public class OrderController {
         OrderResponseDTO order = orderService.getOrderById(id);
         return ResponseEntity.ok(order);
     }
+
+    @GetMapping("/customer/{id}")
+    public ResponseEntity<List<OrderResponseDTO>> getCustomerOrderById(@PathVariable long id) throws NoSuchAlgorithmException, InvalidKeyException {
+        List<OrderResponseDTO> ordersByCustomer = orderService.getOrdersByCustomer(id);
+
+        return ResponseEntity.ok(ordersByCustomer);
+    }
 }

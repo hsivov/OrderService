@@ -62,6 +62,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public List<OrderResponseDTO> getOrdersByCustomer(Long customerId) throws NoSuchAlgorithmException, InvalidKeyException {
         List<Order> orders = orderRepository.findByCustomerId(customerId);
         UserDTO customer = userService.getUserById(customerId);
