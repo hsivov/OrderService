@@ -2,10 +2,9 @@ package com.example.orderservice.controller;
 
 import com.example.orderservice.interceptor.HMACInterceptor;
 import com.example.orderservice.model.dto.CreateOrderRequestDTO;
-import com.example.orderservice.model.dto.GameDTO;
+import com.example.orderservice.model.dto.OrderItemDTO;
 import com.example.orderservice.model.dto.OrderResponseDTO;
 import com.example.orderservice.model.dto.UserDTO;
-import com.example.orderservice.model.entity.Order;
 import com.example.orderservice.model.enums.OrderStatus;
 import com.example.orderservice.service.OrderService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -49,18 +49,21 @@ class OrderControllerTest {
 
     @BeforeEach
     void setUp() {
-        Order mockOrder = new Order();
-        mockOrder.setStatus(OrderStatus.APPROVED);
-
         UserDTO mockCustomer = new UserDTO();
         mockCustomer.setId(1L);
 
-        GameDTO mockGame = new GameDTO();
+        OrderItemDTO mockGame = new OrderItemDTO();
         mockGame.setTitle("Game Title");
 
-        List<GameDTO> mockGames = List.of(mockGame);
+        List<OrderItemDTO> mockGames = List.of(mockGame);
 
-        orderResponseDTO = new OrderResponseDTO(mockOrder, mockCustomer, mockGames);
+        orderResponseDTO = new OrderResponseDTO();
+        orderResponseDTO.setId(1L);
+        orderResponseDTO.setCustomer(mockCustomer);
+        orderResponseDTO.setBoughtGames(mockGames);
+        orderResponseDTO.setTotalPrice(BigDecimal.valueOf(299.99));
+        orderResponseDTO.setStatus(OrderStatus.APPROVED);
+        orderResponseDTO.setOrderDate(LocalDateTime.now());
     }
 
     @Test
