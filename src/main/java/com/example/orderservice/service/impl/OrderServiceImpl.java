@@ -18,7 +18,6 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-
     private final UserService userService;
 
     public OrderServiceImpl(OrderRepository orderRepository, UserService userService) {
@@ -32,9 +31,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        UserDTO customer = userService.getUserById(order.getCustomerId());
-
-        return getOrderResponseDTO(order, customer);
+        return getOrderResponseDTO(order);
     }
 
     @Override
@@ -42,7 +39,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = new Order();
         order.setCustomerId(createOrderRequest.getCustomerId());
         order.setTotalPrice(createOrderRequest.getTotalPrice());
-        order.setStatus(createOrderRequest.getPaymentMethod().equals("CREDIT_CARD") ? OrderStatus.APPROVED : OrderStatus.PENDING);
+        order.setStatus(createOrderRequest.getPaymentMethod().equals("credit-card") ? OrderStatus.APPROVED : OrderStatus.PENDING);
         order.setOrderDate(createOrderRequest.getOrderDate());
 
         List<OrderItem> items = createOrderRequest.getOrderItems().entrySet().stream()
@@ -59,18 +56,21 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        UserDTO customer = userService.getUserById(savedOrder.getCustomerId());
-
-        return getOrderResponseDTO(savedOrder, customer);
+        return getOrderResponseDTO(savedOrder);
     }
 
     @Override
     @Transactional
-    public List<OrderResponseDTO> getOrdersByCustomer(Long customerId) throws NoSuchAlgorithmException, InvalidKeyException {
+    public List<OrderResponseDTO> getOrdersByCustomer(Long customerId) {
         List<Order> orders = orderRepository.findByCustomerId(customerId);
-        UserDTO customer = userService.getUserById(customerId);
 
-        return orders.stream().map(order -> getOrderResponseDTO(order, customer)).toList();
+        return orders.stream().map(order -> {
+            try {
+                return getOrderResponseDTO(order);
+            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+                throw new RuntimeException(e);
+            }
+        }).toList();
     }
 
     @Override
@@ -81,27 +81,28 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(status);
         Order updatedOrder = orderRepository.save(order);
 
-        UserDTO customer = userService.getUserById(updatedOrder.getCustomerId());
-
-        return getOrderResponseDTO(updatedOrder, customer);
+        return getOrderResponseDTO(updatedOrder);
     }
 
     @Override
     @Transactional
     public List<OrderResponseDTO> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
-        return orders.stream().map(order -> {
-            UserDTO customer;
-            try {
-                customer = userService.getUserById(order.getCustomerId());
-            } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-                throw new RuntimeException(e);
-            }
-            return getOrderResponseDTO(order, customer);
-        }).toList();
+
+        return orders.stream()
+                .map(order -> {
+                    try {
+                        return getOrderResponseDTO(order);
+                    } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toList();
     }
 
-    private OrderResponseDTO getOrderResponseDTO(Order order, UserDTO customer) {
+    private OrderResponseDTO getOrderResponseDTO(Order order) throws NoSuchAlgorithmException, InvalidKeyException {
+        UserDTO customer = userService.getUserById(order.getCustomerId());
+
         List<OrderItemDTO> orderItemDTOList = order.getItems().stream()
                 .map(orderItem -> {
                     OrderItemDTO orderItemDTO = new OrderItemDTO();
