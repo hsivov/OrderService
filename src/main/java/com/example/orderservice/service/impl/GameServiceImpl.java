@@ -1,6 +1,6 @@
 package com.example.orderservice.service.impl;
 
-import com.example.orderservice.model.dto.GameDTO;
+import com.example.orderservice.model.dto.OrderItemDTO;
 import com.example.orderservice.service.GameService;
 import com.example.orderservice.util.HMACUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,7 +37,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<GameDTO> getGamesByIds(Set<Long> gameIds) throws NoSuchAlgorithmException, InvalidKeyException {
+    public List<OrderItemDTO> getGamesByIds(Set<Long> gameIds) throws NoSuchAlgorithmException, InvalidKeyException {
         String url = appUrl + "/games";
         String endpoint = "/api/games";
 
@@ -59,7 +59,7 @@ public class GameServiceImpl implements GameService {
         HttpEntity<Set<Long>> request = new HttpEntity<>(gameIds, headers);
 
         // Use ParameterizedTypeReference to specify the response type
-        ResponseEntity<List<GameDTO>> response = restTemplate.exchange(
+        ResponseEntity<List<OrderItemDTO>> response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
                 request,

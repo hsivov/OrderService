@@ -2,17 +2,18 @@ package com.example.orderservice.model.dto;
 
 import java.math.BigDecimal;
 
-public class GameDTO {
-    private Long id;
+public class OrderItemDTO {
+
+    private Long orderItemId;
     private String title;
     private BigDecimal price;
 
-    public Long getId() {
-        return id;
+    public Long getOrderItemId() {
+        return orderItemId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setOrderItemId(Long orderItemId) {
+        this.orderItemId = orderItemId;
     }
 
     public String getTitle() {

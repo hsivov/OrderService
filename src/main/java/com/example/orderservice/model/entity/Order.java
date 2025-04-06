@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -17,10 +17,8 @@ public class Order {
     @Column(nullable = false)
     private Long customerId;
 
-    @ElementCollection
-    @CollectionTable(name = "orders_bought_games", joinColumns = @JoinColumn(name = "order_id"))
-    @Column(name = "game_id")
-    private Set<Long> boughtGamesIds;
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<OrderItem> items;
 
     @Column(nullable = false)
     private BigDecimal totalPrice;
@@ -48,12 +46,12 @@ public class Order {
         this.customerId = customerId;
     }
 
-    public Set<Long> getBoughtGamesIds() {
-        return boughtGamesIds;
+    public List<OrderItem> getItems() {
+        return items;
     }
 
-    public void setBoughtGamesIds(Set<Long> boughtGamesIds) {
-        this.boughtGamesIds = boughtGamesIds;
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
     }
 
     public BigDecimal getTotalPrice() {
