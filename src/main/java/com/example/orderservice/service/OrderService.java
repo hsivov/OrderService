@@ -16,7 +16,9 @@ public interface OrderService {
 
     List<OrderResponseDTO> getOrdersByCustomer(Long customerId) throws NoSuchAlgorithmException, InvalidKeyException;
 
-    OrderResponseDTO updateOrderStatus(Long orderId, OrderStatus status) throws NoSuchAlgorithmException, InvalidKeyException;
+    void updateOrder(Long orderId, OrderStatus status);
 
     List<OrderResponseDTO> getAllOrders();
+
+    List<OrderResponseDTO> getPendingOrders();
 }

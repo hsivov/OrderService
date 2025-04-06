@@ -13,6 +13,9 @@ public class OrderItem {
     private UUID id;
 
     @Column(nullable = false)
+    private Long orderItemId;
+
+    @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)
@@ -36,6 +39,14 @@ public class OrderItem {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public Long getOrderItemId() {
+        return orderItemId;
+    }
+
+    public void setOrderItemId(Long productId) {
+        this.orderItemId = productId;
     }
 
     public String getTitle() {

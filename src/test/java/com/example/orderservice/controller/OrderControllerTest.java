@@ -127,4 +127,27 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$[0].customer.id").value(1))
                 .andExpect(jsonPath("$[0].boughtGames[0].title").value("Game Title"));
     }
+
+    @Test
+    void testGetPendingOrders() throws Exception {
+        orderResponseDTO.setStatus(OrderStatus.PENDING);
+        when(orderService.getPendingOrders()).thenReturn(List.of(orderResponseDTO));
+        when(hmacInterceptor.preHandle(any(), any(), any())).thenReturn(true);
+
+        mockMvc.perform(get("/api/orders/pending"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].status").value("PENDING"));
+    }
+
+    @Test
+    void testUpdateOrderStatus() throws Exception {
+        when(hmacInterceptor.preHandle(any(), any(), any())).thenReturn(true);
+
+        mockMvc.perform(post("/api/orders/update")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(orderResponseDTO)))
+                .andExpect(status().isOk());
+
+        verify(orderService, times(1)).updateOrder(orderResponseDTO.getId(), orderResponseDTO.getStatus());
+    }
 }

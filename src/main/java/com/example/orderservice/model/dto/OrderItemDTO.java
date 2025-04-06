@@ -4,8 +4,17 @@ import java.math.BigDecimal;
 
 public class OrderItemDTO {
 
+    private Long orderItemId;
     private String title;
     private BigDecimal price;
+
+    public Long getOrderItemId() {
+        return orderItemId;
+    }
+
+    public void setOrderItemId(Long orderItemId) {
+        this.orderItemId = orderItemId;
+    }
 
     public String getTitle() {
         return title;

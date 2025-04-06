@@ -44,4 +44,18 @@ public class OrderController {
 
         return ResponseEntity.ok(ordersByCustomer);
     }
+
+    @GetMapping("/pending")
+    public ResponseEntity<List<OrderResponseDTO>> getPendingOrders() {
+        List<OrderResponseDTO> pendingOrders = orderService.getPendingOrders();
+
+        return ResponseEntity.ok(pendingOrders);
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<?> updateOrderStatus(@RequestBody OrderResponseDTO orderResponseDTO) {
+        orderService.updateOrder(orderResponseDTO.getId(), orderResponseDTO.getStatus());
+
+        return ResponseEntity.ok().build();
+    }
 }
